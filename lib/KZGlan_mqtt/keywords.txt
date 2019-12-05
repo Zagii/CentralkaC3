@@ -1,0 +1,29 @@
+#######################################
+# Syntax Coloring Map For Test
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+KZGlan_mqtt	KEYWORD1
+KZGlan_mqttCallback KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+KZGlan_mqttCallback	KEYWORD2
+getEthStatusString	KEYWORD2
+publish KEYWORD2
+publishPrefix KEYWORD2
+
+######################################
+# Instances (KEYWORD2)
+#######################################
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+DEBUG_LAN_MQTT LITERAL1

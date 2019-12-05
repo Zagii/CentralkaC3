@@ -1,0 +1,33 @@
+#######################################
+# Syntax Coloring Map For Test
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+KZGoutput	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+KZGoutput KEYWORD2
+setOutput KEYWORD2
+setOutputON KEYWORD2
+setOutputOFF KEYWORD2
+setFadingSpeed KEYWORD2
+setFadingDuration KEYWORD2
+getState KEYWORD2
+getJsonStatusStr KEYWORD2
+isFading KEYWORD2
+getTimeOfHardwareState KEYWORD2
+######################################
+# Instances (KEYWORD2)
+#######################################
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+DEBUG_KZG_OUTPUT LITERAL1
