@@ -228,8 +228,9 @@ void KZGcentralka::loop()
   {
     if(_outputs[j].loop())
     {
-      DPRINTLN_CENT(String("MemFree: "+String(freeMemory())+", FreeRAM: "+String(freeRam())));
-       // String so= _outputs[j].getJsonStatusStr();
+      DPRINTLN_CENT("MemFree: ");
+      DPRINTLN_CENT(freeMemory());
+         // String so= _outputs[j].getJsonStatusStr();
        DPRINT_CENT("@@@ output change finished: ");
        //DPRINTLN_CENT(so);
     }
