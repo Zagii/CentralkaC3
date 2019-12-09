@@ -76,7 +76,9 @@ KZGcentralka c;
 void setup()
 {
     Serial.begin(115200);
+    
     Serial.println("############## Setup() ############");
+    delay(3000);
     byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
     IPAddress mqttHost(192, 168, 1, 132);
 
@@ -105,7 +107,7 @@ void setup()
     for(uint8_t i=0;i<ile_wyjsc;i++)
     {
       n= myName+String(wyjItem[i]);
-      Serial.println(String("out i: "+String(i)+", pin: "+String(wyjPIN_pin[i])));
+     // Serial.println(String("out i: "+String(i)+", pin: "+String(wyjPIN_pin[i])));
       if(wyjPWM[i])
       {
         c.addOutput(n.c_str(),wyjPIN_pin[i],0xFFF,0,0,true);

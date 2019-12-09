@@ -52,7 +52,7 @@ void KZGcentralka::mqttMyCallbackStr(String topic, String msg)
    
   if(topic.indexOf("set")>0)
   {
-    DPRINTLN_CENT("topic zawiera set");
+    //DPRINTLN_CENT("topic zawiera set");
     StaticJsonDocument<200> doc;
     //DynamicJsonDocument doc(msg.length());
     DeserializationError error = deserializeJson(doc, msg);
@@ -64,7 +64,7 @@ void KZGcentralka::mqttMyCallbackStr(String topic, String msg)
     const char* name = doc["out"];
      const char* c=doc["c"]; 
     String nameStr=String(c)+String(name);
-    DPRINT_CENT("   szukamy, name:");DPRINTLN_CENT(nameStr);
+  //  DPRINT_CENT("   szukamy, name:");DPRINTLN_CENT(nameStr);
     uint8_t id=255;
     //////// szukanie odpowiedniego wyjscia
     for(uint8_t i=0;i<_output_num;i++)
@@ -82,23 +82,23 @@ void KZGcentralka::mqttMyCallbackStr(String topic, String msg)
       return;
     }
         
-        DPRINTLN_CENT(id);
+   //     DPRINTLN_CENT(id);
     uint16_t value; 
     String rozkaz=doc["set"]|"brak";
     if(rozkaz=="brak") return;
-DPRINTLN_CENT(rozkaz);
+//DPRINTLN_CENT(rozkaz);
     if(rozkaz=="ON") value=_outputs[id].getOnValue();
     else if(rozkaz=="OFF") value=_outputs[id].getOffValue();
     else if(rozkaz=="PWM") value=doc["pwm"];
-DPRINTLN_CENT(value);
+//DPRINTLN_CENT(value);
     //if(value==nullptr)return;
     unsigned long def=999999;
     unsigned long ttc=doc["ttc"]|def; // za ile bedzie zmiana stanu
-    DPRINTLN_CENT(ttc);
+  //  DPRINTLN_CENT(ttc);
     unsigned long futureState=doc["futSt"]|def; //na jaki stan zmieniamy
-    DPRINTLN_CENT(futureState);
+    //DPRINTLN_CENT(futureState);
     unsigned long duration =doc["dur"]|def;
-    DPRINTLN_CENT(duration);
+   // DPRINTLN_CENT(duration);
     unsigned long speed=doc["speed"]|def;
     DPRINTLN_CENT(speed);
     if((ttc!=def)&&(futureState!=def)) //timeToChange, czyli będzie zmiana stanu po czasie duratiuon
@@ -119,6 +119,7 @@ DPRINTLN_CENT(value);
     {
       if(rozkaz=="PWM")
       {
+        _outputs[id].stopWaitingStopFading();
         if(duration!=def)
           _outputs[id].setFadingDuration(value,duration);
         else if(speed!=def)
@@ -217,11 +218,15 @@ void KZGcentralka::loop()
   {
     if(_inputs[i].loop())
     {
-      String s=_inputs[i].getStatusString();
+           // DPRINTLN_CENT("Inp MemFree: ");
+     // DPRINTLN_CENT(freeMemory());
+      //String s=_inputs[i].getStatusString();
      DPRINTLN_CENT("Btn event, new status: ");
-      DPRINTLN_CENT(s);
+     _inputs[i].getStatusChar(_jsonCharArr);
+     DPRINT_CENT(strlen(_jsonCharArr));
+      DPRINTLN_CENT(_jsonCharArr);
      // s="test";
-      _ethMqtt.publishPrefix("input/"+String(i)+"/",s);
+      _ethMqtt.publishPrefixChar("input/"+String(i)+"/",_jsonCharArr);
     }
   }
   for(uint8_t j=0;j<_output_num;j++)
@@ -230,9 +235,11 @@ void KZGcentralka::loop()
     {
       DPRINTLN_CENT("MemFree: ");
       DPRINTLN_CENT(freeMemory());
+      _outputs[j].getJsonStatusChar(_jsonCharArr);
          // String so= _outputs[j].getJsonStatusStr();
        DPRINT_CENT("@@@ output change finished: ");
-       //DPRINTLN_CENT(so);
+       DPRINT_CENT(strlen(_jsonCharArr));
+       DPRINTLN_CENT(_jsonCharArr);
     }
     if(_outputs[j].isFading())
     {

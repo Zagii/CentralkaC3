@@ -103,6 +103,39 @@ String KZGinput::getStatusString()
 return w;
 }
 
+char* KZGinput::getStatusChar(char* txt)
+{
+  //StaticJsonBuffer<100> jsonBuffer;
+  //JsonObject& root = jsonBuffer.createObject();
+  strcpy(txt,String("{\"type\":\"KZGinput\"").c_str());//,\"pin\":"+String(_pin);
+  strcat(txt,",\"name\":\"");strcat(txt,_name.c_str()); strcat(txt, "\"");
+
+  if(_buttonState==_buttonPressed)
+  {
+      //root["buttonState"]="p";
+      strcat(txt,",\"btnSt\":\"p\"");
+  }
+  else 
+  {
+    //root["buttonState"]="r";
+    strcat(txt,",\"btnSt\":\"r\"");
+  }
+  char x[8];
+  itoa(_state,x,10); strcat(txt,",\"st\":"); strcat(txt,x);
+  itoa(_isClicked,x,10); strcat(txt,",\"isC\":");strcat(txt,x);
+  itoa(_isDblClicked,x,10); strcat(txt,",\"isDblC\":");strcat(txt,x);
+  itoa(_isPressed,x,10); strcat(txt,",\"isP\":");strcat(txt,x);
+  itoa(_isRelesed,x,10); strcat(txt,",\"isR\":"); strcat(txt,x);
+  itoa(_isSwitched,x,10); strcat(txt,",\"isSw\":");strcat(txt,x);
+  strcat(txt,"}");
+
+  /*root["isClicked"]=_isClicked;
+  root["isDblClicked"]=_isDblClicked;
+  root["isPressed"]=_isPressed;
+  root["isRelesed"]=_isRelesed;
+  root["isSwitched"]=_isSwitched;*/
+return txt;
+}
 
 ///////////////////////////////////////////////////////////////
 //////////////////   loop         /////////////////////////////

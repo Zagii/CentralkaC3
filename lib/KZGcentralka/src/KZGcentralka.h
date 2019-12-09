@@ -29,6 +29,7 @@
 class KZGcentralka
 {
   byte _mac[7];//    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
+  char _jsonCharArr[200];
   String _name;
   uint8_t _input_num;
   uint8_t _output_num;

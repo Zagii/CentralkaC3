@@ -58,6 +58,7 @@ public:
   String getEthStatusString();
   void publish(String topic, String msg);
   void publishPrefix(String topic, String msg);
+  void publishPrefixChar(String topic,char* m);
   PubSubClient getMqttClient(){return _mqttClient;}
 };
 #endif

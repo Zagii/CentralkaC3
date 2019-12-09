@@ -22,20 +22,20 @@
 
 class KZGoutput
 {
-    uint8_t _pin;        // hardware pin number. 
-    String _name;        // human button name
-    unsigned long _on;         // 255
-    unsigned long _off;        // 0
-    unsigned long _max;        // max/min value of _on/_off
-    unsigned long _min;
-    unsigned long _currentState=0;  // current PWM state during fading
+    uint8_t _pin=0;        // hardware pin number. 
+    String _name="";        // human button name
+    unsigned long _on=0;         // 255
+    unsigned long _off=0;        // 0
+    unsigned long _max=0;        // max/min value of _on/_off
+    unsigned long _min=0;
+    unsigned long _currentState=UNDEF;  // current PWM state during fading
     unsigned long _hardwareState=UNDEF; // state assigned in loop to hardware pin
     unsigned long _aimState=0;    // state when fading should be stopped
     bool _isFading=false;
-    unsigned long _fadeSpeed;
+    unsigned long _fadeSpeed=0;
     unsigned long _timerPWM=0;
     unsigned long _timeOfHardwareState=0; // przechowuje czas kiedy wyjscie fizyczne zmieniło stan
-	unsigned long _cyklPWM; // cykl co ile ma byc zmiana stanu w trakcie fadowania
+	unsigned long _cyklPWM=0; // cykl co ile ma byc zmiana stanu w trakcie fadowania
 	
 	bool _usePCA9685=false;
 	FaBoPWM _faboPWM;
@@ -43,7 +43,7 @@ class KZGoutput
 	bool _isWaitingForChange=false; // is output waiting for automated change state
 	unsigned long _waitingForChangeDuration=0; //millis time when change should happened
 	unsigned long _waitingForChangeStartTime=0; //millis of first setting value
-	unsigned long _futureState;		// state of future change, turn off or setup def value
+	unsigned long _futureState=0;		// state of future change, turn off or setup def value
 	bool _futureChangeFading=false;
 	
 	void prepareAutoChangeState(unsigned long futureState, unsigned long timeToChangeState,bool fading);
@@ -61,11 +61,15 @@ class KZGoutput
     bool loop();    // if state has changed
     unsigned long getState(){return _hardwareState;}
     String getJsonStatusStr();
+    char * getJsonStatusChar(char* txt);
     bool isFading(){return _isFading;}
+
+    void stopWaitingStopFading();
     unsigned long getTimeOfHardwareState(){return _timeOfHardwareState;}
     String getName(){return _name;}
 	void setOutputThenChange(unsigned long state, unsigned long futureState, unsigned long timeToChangeState);
 	void setFadingSpeedThenChange(unsigned long aimState, unsigned long speed,unsigned long futureState, unsigned long timeToChangeState);
 	void setFadingDurationThenChange(unsigned long aimState, unsigned long duration, unsigned long futureState, unsigned long timeToChangeState);
+
 };
 #endif

@@ -64,6 +64,7 @@ class KZGinput
     void  init(uint8_t pin,String name, uint8_t initState, bool activeLow);
     bool loop(void); // return true if btn detect a change
     String getStatusString();
+    char* getStatusChar(char* txt);
     bool isClicked(){return _isClicked;}
     bool isDblClicked(){return _isDblClicked;}
     bool isPressed(){return _isPressed;}

@@ -27,12 +27,16 @@ void KZGoutput::begin(String name, uint8_t pin, unsigned long on, unsigned long 
     _max=_off;
     _min=_on;
   }
-  String s="outBegin(name: "+name+", pin: "+String(pin)+", on: "+String(on)+", off: "+String(off)+", initState: "+String(initState)+", usePCA: "+String(usePCA9685);
- DPRINTLN_OUT(s);
+ // String s="outBegin(name: "+name+", pin: "+String(pin)+", on: "+String(on)+", off: "+String(off)+", initState: "+String(initState)+", usePCA: "+String(usePCA9685);
+// DPRINTLN_OUT(s);
   setOutput(initState);
   loop();
 }
-
+void KZGoutput::stopWaitingStopFading()
+{
+  _isWaitingForChange=false;
+  _isFading=false;
+}
 void KZGoutput::setOutputStopWaiting(unsigned long state)
 {
    _isWaitingForChange=false; /////<<<<< to dodałem ostatnio do wytestowania wplyw na pwm
@@ -40,7 +44,7 @@ void KZGoutput::setOutputStopWaiting(unsigned long state)
 }
 void KZGoutput::setOutput(unsigned long state)
 {
-  DPRINT_OUT("KZGoutput::setOutput = ");DPRINTLN_OUT(state);
+  //DPRINT_OUT("KZGoutput::setOutput = ");DPRINTLN_OUT(state);
   _currentState=state;
   _isFading=false;
  
@@ -70,12 +74,20 @@ void KZGoutput::setFadingDuration(unsigned long aimState, unsigned long duration
 	if(_currentState==aimState)return;
     unsigned long speed,droga;
 	if(aimState>_currentState)droga=aimState-_currentState; else droga = _currentState-aimState;
-	_cyklPWM=duration/droga;
-	_fadeSpeed=1;
+  _cyklPWM=T_PWM;
+	speed=duration/_cyklPWM;
+  if(speed==0)speed=1;
+
+  //_cyklPWM=duration/droga;
+	_fadeSpeed=droga/speed;
+  if(_fadeSpeed==0)_fadeSpeed=1;
 	_aimState=aimState;
 	_isFading=true;
 	_timerPWM=millis();
-	DPRINT_OUT("KZGoutput::setFadingDuration = ");DPRINT_OUT(aimState);DPRINT_OUT(", cykl=");DPRINT_OUT(_cyklPWM);DPRINT_OUT(" duration=");DPRINTLN_OUT(duration);
+	DPRINT_OUT("KZGoutput::setFadingDuration aimState= ");DPRINT_OUT(aimState);
+  DPRINT_OUT(", curState=");DPRINT_OUT(_currentState);
+  DPRINT_OUT(", fadeSpeed=");DPRINT_OUT(_fadeSpeed);
+  DPRINT_OUT(" duration=");DPRINTLN_OUT(duration);
 	DPRINT_OUT(" startMillis=");DPRINTLN_OUT(_timerPWM);
 
 }
@@ -208,6 +220,34 @@ bool KZGoutput::loop()    // if state has changed
     }
   }
   return false;
+}
+
+char * KZGoutput::getJsonStatusChar(char* txt)
+{
+  String f="0";
+  if(isFading())f="1";
+  strcpy(txt,String("{\"name\":\"").c_str());  strcat(txt,_name.c_str());
+  char u[10];
+  sprintf (u, "%lu", _hardwareState);
+  strcat(txt,"\", \"v\":");  strcat(txt,u);
+  strcat(txt,", \"isFad\":"); strcat(txt,f.c_str());
+  sprintf (u, "%lu",_aimState);
+  strcat(txt,", \"aimV\":"); strcat(txt,u);
+  f="0";
+  unsigned long ttc=0;
+  if(_isWaitingForChange)
+  {
+  f="1";
+  ttc=millis()-_waitingForChangeStartTime-_waitingForChangeDuration;
+  }
+  strcat(txt,", \"isW8t4Chng\":");strcat(txt,f.c_str());
+  sprintf (u, "%lu",_futureState);
+  strcat(txt,", \"futSt\":");strcat(txt,u);
+  sprintf (u, "%lu",ttc);
+  strcat(txt,", \"ttc\":");strcat(txt,u);
+  strcat(txt,"}");
+  return txt;
+
 }
 
 String KZGoutput::getJsonStatusStr()
