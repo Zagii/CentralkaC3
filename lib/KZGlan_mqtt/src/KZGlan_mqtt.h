@@ -43,6 +43,16 @@ class KZGlan_mqtt
   String _mojTopicIDPublish="C1/Pub/";         // topic z komunikatami do serwera
   String _mojTopicIDPublishDebug="DebugTopic/C1/"; // topic z komunikatami do serwera
   String _mojTopicIDPing="C1/Ping/";           //topic z komukatami keepalive
+  
+  char _mqttUsrCh[10];
+  char _mqttPwdCh[10];
+  
+  char _nameCh[5];                         // human name of device
+  char _mojTopicIDSubscribeCh[30];//"/Sub/";         //topic z komunikatami z serwera
+  char _mojTopicIDSubscribeConfigCh[30];//="/Config/";   //topic z komunikatami z serwera
+  char _mojTopicIDPublishCh[50];//="C1/Pub/";         // topic z komunikatami do serwera
+  char _mojTopicIDPublishDebugCh[50];//="DebugTopic/C1/"; // topic z komunikatami do serwera
+  char _mojTopicIDPingCh[15];//="C1/Ping/";           //topic z komukatami keepalive
 
   //void callback(char* topic, byte* payload, unsigned int length);
   void ethReconnect();
@@ -54,10 +64,12 @@ public:
   KZGlan_mqttCallback _mqttCallback;
   KZGlan_mqtt(){};
   void begin(String name,byte * mac, IPAddress mqttHostIP, String mqttHost,String mqttUser,String mqttPwd, uint16_t mqttPort, KZGlan_mqttCallback mqttCallback);
+  void beginCh(chr* name,byte * mac, IPAddress mqttHostIP, char* mqttHost,char* mqttUser,char* mqttPwd, uint16_t mqttPort, KZGlan_mqttCallback mqttCallback);
   void loop();
   String getEthStatusString();
   void publish(String topic, String msg);
   void publishPrefix(String topic, String msg);
+  void publishPrefixChCh(char* topic,char* m);
   void publishPrefixChar(String topic,char* m);
   PubSubClient getMqttClient(){return _mqttClient;}
 };
