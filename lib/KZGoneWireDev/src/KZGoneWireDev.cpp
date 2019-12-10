@@ -95,6 +95,8 @@ void KZGoneWireDev::checkNewTermometers()
     }else{
       DPRINT_1W("Found ghost device at ");
       DPRINT_1W(i, DEC);
+	DPRINT_1W(" with address: ");
+	DPRINT_1W(printAddressToStr(_tempDeviceAddress[i]));
       DPRINT_1W(" but could not detect address. Check power and cabling");
       DPRINTLN_1W();
       }
