@@ -201,10 +201,15 @@ void KZGcentralka::loop()
       //  Serial.print(" ** i= ");Serial.print(i);Serial.print(", addr: ");Serial.print(_oneW->getDeviceAddresStr(i));
       //  Serial.print(", T=");Serial.print(_oneW->getDeviceTemperature(i));Serial.println(" C");
 
-        String s="{\"name\":\""+_name+"\", \"tempAddr\": \""+_oneW->getDeviceAddresStr(i)+"\"";
-        s+=", \"t\": "+String(_oneW->getDeviceTemperature(i))+"}";
-	     //  DPRINT_CENT("    -");DPRINT_CENT(i);DPRINT_CENT(": ");DPRINTLN_CENT(s);
-        _ethMqtt.publishPrefix("temp/"+_oneW->getDeviceAddresStr(i)+"/",s);
+      //  String s="{\"name\":\""+_name+"\", \"tempAddr\": \""+_oneW->getDeviceAddresStr(i)+"\"";
+        //s+=", \"t\": "+String(_oneW->getDeviceTemperature(i))+"}";
+	      
+	 strcpy(_jsonCharArr,"{\"name\":\""); strcat(_jsonCharArr,_nameCh);
+	 strcat(_jsonCharArr,"\", \"tempAddr\": \"");strcat(_jsonCharArr,_oneW->getDeviceAddresStr(i).c_str());
+	 String tstr=String(_oneW->getDeviceTemperature(i));
+	 strcat(_jsonCharArr,"\", \"t\": "); strcat(_jsonCharArr,tstr.c_str()); strcat(_jsonCharArr,"}");
+	       DPRINT_CENT("    -");DPRINT_CENT(i);DPRINT_CENT(": ");DPRINTLN_CENT(_jsonCharArr);
+        _ethMqtt.publishPrefixChar("temp/"+_oneW->getDeviceAddresStr(i)+"/",_jsonCharArr);
       }
       //Serial.println(" ************************ koniec ***************************** ");
       
@@ -240,11 +245,14 @@ void KZGcentralka::loop()
        DPRINT_CENT("@@@ output change finished: ");
        DPRINT_CENT(strlen(_jsonCharArr));
        DPRINTLN_CENT(_jsonCharArr);
+       _ethMqtt.publishPrefixChar("output/"+String(i)+"/",_jsonCharArr);
     }
     if(_outputs[j].isFading())
     {
         if(millis()%300==0)
         {
+	    _outputs[j].getJsonShortStatusChar(_jsonCharArr);
+	    _ethMqtt.publishPrefixChar("output/"+String(i)+"/",_jsonCharArr);
            // String so= _outputs[j].getJsonStatusStr();
             //DPRINT_CENTLN("@@@@@@@@ analog output is fading: ");
             //DPRINTLN_CENT(so);
