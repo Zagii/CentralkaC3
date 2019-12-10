@@ -62,6 +62,7 @@ class KZGoutput
     unsigned long getState(){return _hardwareState;}
     String getJsonStatusStr();
     char * getJsonStatusChar(char* txt);
+    char * getJsonShortStatusChar(char* txt);
     bool isFading(){return _isFading;}
 
     void stopWaitingStopFading();
