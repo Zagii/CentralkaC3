@@ -221,7 +221,15 @@ bool KZGoutput::loop()    // if state has changed
   }
   return false;
 }
-
+char * KZGoutput::getJsonShortStatusChar(char* txt)
+{
+  strcpy(txt,String("{\"name\":\"").c_str());  strcat(txt,_name.c_str());
+  char u[10];
+  sprintf (u, "%lu", _hardwareState);
+  strcat(txt,"\", \"v\":");  strcat(txt,u);
+  strcat(txt,"}");
+  return txt;
+}
 char * KZGoutput::getJsonStatusChar(char* txt)
 {
   String f="0";
