@@ -38,6 +38,16 @@ void KZGlan_mqtt::publish(String topic, String msg)
     _mqttClient.publish(topic.c_str(),msg.c_str());
   }
 }
+void KZGlan_mqtt::publishPrefixChCh(char* t,char* m)
+{
+  if (_mqttClient.connected())
+  {
+    char topic[MAX_TOPIC];
+    strcpy(topic,_mojTopicIDPublishCh);
+    strcat(topic,t);
+    _mqttClient.publish(topic,m);
+  }
+}
 void KZGlan_mqtt::publishPrefixChar(String topic,char* m)
 {
   if (_mqttClient.connected())
@@ -68,16 +78,23 @@ void KZGlan_mqtt::publishPrefix(String topic, String msg)
 void KZGlan_mqtt::begin(String name,byte * mac, IPAddress mqttHostIP, String mqttHost,String mqttUser,String mqttPwd, uint16_t mqttPort, KZGlan_mqttCallback mqttCallback)
 {
   DPRINTLN_LAN("Debug KZGlan_mqtt::begin start"); 
-  _name=name;
+  _name=name;	strcpy(_nameCh,name.c_str());
   _mac[0]=mac[0];_mac[1]=mac[1];_mac[2]=mac[2];
   _mac[3]=mac[3];_mac[4]=mac[4];_mac[5]=mac[5];
   _mojTopicIDSubscribe=name+"/Sub/#"; //topic z komunikatami z serwera
+	strcpy(_mojTopicIDSubscribeCh,_nameCh); strcat(_mojTopicIDSubscribeCh,"/Sub/#");
   _mojTopicIDSubscribeConfig=name+"/ConfigSub/#"; //topic z komunikatami z serwera
+	strcpy(_mojTopicIDSubscribeConfigCh,_nameCh); strcat(_mojTopicIDSubscribeConfigCh,"/ConfigSub/#");
   _mojTopicIDPublish=name+"/Pub/"; // topic z komunikatami do serwera
+	strcpy(_mojTopicIDPublishCh,_nameCh); strcat(_mojTopicIDPublishCh,"/Pub/");
   _mojTopicIDPublishDebug="DebugTopic/"+name+"/"; // topic z komunikatami do serwera
+	strcpy(_mojTopicIDPublishDebugCh,"DebugTopic/"); strcat(_mojTopicIDPublishDebugCh,_nameCh);
   _mojTopicIDPing=name+"/Ping/"; //topic z komukatami keepalive
+	strcpy(_mojTopicIDPingCh,_nameCh); strcat(_mojTopicIDPingCh,"/Ping/");
   _mqttUsr=mqttUser;
+	strcpy(_mqttUsrCh,mqttUser.c_str());
   _mqttPwd=mqttPwd;
+	strcpy(_mqttPwdCh,mqttPwd.c_str());
   _mqttPort=mqttPort;
   if(mqttHost=="")
   {
@@ -102,6 +119,7 @@ void KZGlan_mqtt::begin(String name,byte * mac, IPAddress mqttHostIP, String mqt
   mqttReconnect();
   DPRINTLN_LAN("Debug KZGlan_mqtt::begin end"); 
 }
+
 
 void KZGlan_mqtt::ethReconnect()
 {
