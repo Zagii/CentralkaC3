@@ -18,6 +18,8 @@
 //typedef void (*KZGlan_mqttCallback) (String topic, String msg);
 typedef void (*KZGlan_mqttCallback) (char* topic, uint8_t* payload, unsigned int length);
 
+#define MAX_TOPIC 50
+#define MAX_MSG 200
 
 class KZGlan_mqtt
 {
@@ -48,10 +50,10 @@ class KZGlan_mqtt
   char _mqttPwdCh[10];
   
   char _nameCh[5];                         // human name of device
-  char _mojTopicIDSubscribeCh[30];//"/Sub/";         //topic z komunikatami z serwera
-  char _mojTopicIDSubscribeConfigCh[30];//="/Config/";   //topic z komunikatami z serwera
-  char _mojTopicIDPublishCh[50];//="C1/Pub/";         // topic z komunikatami do serwera
-  char _mojTopicIDPublishDebugCh[50];//="DebugTopic/C1/"; // topic z komunikatami do serwera
+  char _mojTopicIDSubscribeCh[MAX_TOPIC];//"/Sub/";         //topic z komunikatami z serwera
+  char _mojTopicIDSubscribeConfigCh[MAX_TOPIC];//="/Config/";   //topic z komunikatami z serwera
+  char _mojTopicIDPublishCh[MAX_TOPIC];//="C1/Pub/";         // topic z komunikatami do serwera
+  char _mojTopicIDPublishDebugCh[MAX_TOPIC];//="DebugTopic/C1/"; // topic z komunikatami do serwera
   char _mojTopicIDPingCh[15];//="C1/Ping/";           //topic z komukatami keepalive
 
   //void callback(char* topic, byte* payload, unsigned int length);
