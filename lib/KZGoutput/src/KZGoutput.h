@@ -46,7 +46,7 @@ class KZGoutput
 	unsigned long _futureState=0;		// state of future change, turn off or setup def value
 	bool _futureChangeFading=false;
 	
-	void prepareAutoChangeState(unsigned long futureState, unsigned long timeToChangeState,bool fading);
+	void prepareAutoChangeStateLong(unsigned long futureState, unsigned long timeToChangeState,bool fading);
 	void setOutputLong(unsigned long state);
 	void setFadingSpeedLong(unsigned long aimState, unsigned long speed);
         void setFadingDurationLong(unsigned long aimState, unsigned long duration);
@@ -75,9 +75,9 @@ class KZGoutput
 	//void setOutputStopWaiting(uint8_t state);
 	//void setFadingSpeed(unsigned long aimState, unsigned long speed);
     	void setFadingDuration(unsigned long aimState, unsigned long duration);
-	void setOutputThenChange(uint8_t state,uint8_t futureState, double timeToChangeState);
+	void setOutputThenChange(uint8_t state, uint8_t futureState,  double secondsToChangeState);
 	//void setFadingSpeedThenChange(unsigned long aimState, unsigned long speed,unsigned long futureState, unsigned long timeToChangeState);
-	void setFadingDurationThenChange(uint8_t aimState, double duration, uint8_t futureState, double timeToChangeState);
+	void setFadingDurationThenChange(uint8_t aimState, double duration, uint8_t futureState, double secondsToChangeState);
 
 };
 #endif
