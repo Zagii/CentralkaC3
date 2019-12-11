@@ -93,22 +93,24 @@ void KZGcentralka::mqttMyCallbackStr(String topic, String msg)
 //DPRINTLN_CENT(value);
     //if(value==nullptr)return;
     unsigned long def=999999;
-    unsigned long ttc=doc["ttc"]|def; // za ile bedzie zmiana stanu
+    uint8_t def8=111; //tylko zakres 0-100%
+    double defD=-1.0; //ujemne nie mogą być
+    double ttc=doc["ttc"]|defD; // za ile bedzie zmiana stanu
   //  DPRINTLN_CENT(ttc);
-    unsigned long futureState=doc["futSt"]|def; //na jaki stan zmieniamy
+    uint8_t futureState=doc["futSt"]|def8; //na jaki stan zmieniamy
     //DPRINTLN_CENT(futureState);
-    unsigned long duration =doc["dur"]|def;
+    double duration =doc["dur"]|defD;
    // DPRINTLN_CENT(duration);
-    unsigned long speed=doc["speed"]|def;
-    DPRINTLN_CENT(speed);
-    if((ttc!=def)&&(futureState!=def)) //timeToChange, czyli będzie zmiana stanu po czasie duratiuon
+    //unsigned long speed=doc["speed"]|def;
+    //DPRINTLN_CENT(speed);
+    if((ttc!=defD)&&(futureState!=def8)) //timeToChange, czyli będzie zmiana stanu po czasie duratiuon
     {                 // zmieni sie na futureState
       if(rozkaz=="PWM")
       {
-        if(duration!=def)
+        if(duration!=defD)
           _outputs[id].setFadingDurationThenChange(value,duration,futureState,ttc);
-        else if(speed!=def)
-          _outputs[id].setFadingSpeedThenChange(value,speed,futureState,ttc);
+      //  else if(speed!=def)
+        //  _outputs[id].setFadingSpeedThenChange(value,speed,futureState,ttc);
         else 
           _outputs[id].setOutputThenChange(value,futureState,ttc);
       }else
@@ -120,15 +122,16 @@ void KZGcentralka::mqttMyCallbackStr(String topic, String msg)
       if(rozkaz=="PWM")
       {
         _outputs[id].stopWaitingStopFading();
-        if(duration!=def)
+        if(duration!=defD)
           _outputs[id].setFadingDuration(value,duration);
-        else if(speed!=def)
-          _outputs[id].setFadingSpeed(value,speed);
+        //else if(speed!=def)
+//          _outputs[id].setFadingSpeed(value,speed);
         else 
-          _outputs[id].setOutputStopWaiting(value);
+          _outputs[id].setOutput(value);
       }else
       {
-        _outputs[id].setOutputStopWaiting(value);
+	_outputs[id].stopWaitingStopFading();
+        _outputs[id].setOutput(value);
       }
     }  
   }
