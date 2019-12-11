@@ -56,6 +56,14 @@ void KZGlan_mqtt::publishPrefixChar(String topic,char* m)
     _mqttClient.publish(t.c_str(),m);
   }
 }
+void KZGlan_mqtt::publishDebugChar(char* m)
+{
+  if (_mqttClient.connected())
+  {
+    
+    _mqttClient.publish(_mojTopicIDPublishDebugCh,m);
+  }
+}
 void KZGlan_mqtt::publishPrefix(String topic, String msg)
 {
   if (_mqttClient.connected())
