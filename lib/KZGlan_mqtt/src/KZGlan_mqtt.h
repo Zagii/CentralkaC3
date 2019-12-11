@@ -70,6 +70,7 @@ public:
   void loop();
   String getEthStatusString();
   void publish(String topic, String msg);
+  void publishDebugChar(char* m);
   void publishPrefix(String topic, String msg);
   void publishPrefixChCh(char* topic,char* m);
   void publishPrefixChar(String topic,char* m);
