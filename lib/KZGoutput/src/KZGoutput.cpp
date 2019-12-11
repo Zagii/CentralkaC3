@@ -29,7 +29,7 @@ void KZGoutput::begin(String name, uint8_t pin, unsigned long on, unsigned long 
   }
  // String s="outBegin(name: "+name+", pin: "+String(pin)+", on: "+String(on)+", off: "+String(off)+", initState: "+String(initState)+", usePCA: "+String(usePCA9685);
 // DPRINTLN_OUT(s);
-  setOutput(initState);
+  setOutputLong(initState);
   loop();
 }
 void KZGoutput::stopWaitingStopFading()
@@ -37,14 +37,18 @@ void KZGoutput::stopWaitingStopFading()
   _isWaitingForChange=false;
   _isFading=false;
 }
-void KZGoutput::setOutputStopWaiting(unsigned long state)
+/*void KZGoutput::setOutputStopWaiting(uint8_t state)
 {
    _isWaitingForChange=false; /////<<<<< to dodałem ostatnio do wytestowania wplyw na pwm
    setOutput(state);
-}
-void KZGoutput::setOutput(unsigned long state)
+}*/
+void KZGoutput::setOutput(uint8_t state)
 {
-  //DPRINT_OUT("KZGoutput::setOutput = ");DPRINTLN_OUT(state);
+ setOutputLong( getUnMappedValue(state)  );
+}
+void KZGoutput::setOutputLong(unsigned long state)
+{
+  //DPRINT_OUT("KZGoutput::setOutputLong = ");DPRINTLN_OUT(state);
   _currentState=state;
   _isFading=false;
  
@@ -54,7 +58,7 @@ void KZGoutput::setOutput(unsigned long state)
  * aimState - docelowy stan PWM
  * speed - predkosc zmian PWM w krokach/s
  *****************************/
-void KZGoutput::setFadingSpeed(unsigned long aimState, unsigned long speed)
+void KZGoutput::setFadingSpeedLong(unsigned long aimState, unsigned long speed)
 {
   DPRINT_OUT("KZGoutput::setFadingSpeed = ");DPRINT_OUT(aimState);DPRINT_OUT(" speed=");DPRINTLN_OUT(speed);
   if(_currentState==aimState)return;
@@ -65,11 +69,18 @@ void KZGoutput::setFadingSpeed(unsigned long aimState, unsigned long speed)
   _cyklPWM=T_PWM;
 }
 
+
 /******************************
  * aimState - docelowy PWM
  * duration - czas trwania fadingu w ms
  * *************************/
-void KZGoutput::setFadingDuration(unsigned long aimState, unsigned long duration)
+void KZGoutput::setFadingDuration(uint8_t aimState, double duration)
+{
+	unsigned long as=getUnMappedValue(aimstate);
+	unsigned long dur=(unsigned long) duration*1000;
+	setFadingDurationLong(as,dur);
+}
+void KZGoutput::setFadingDurationLong(unsigned long aimState, unsigned long duration)
 {
 	if(_currentState==aimState)return;
     unsigned long speed,droga;
@@ -84,7 +95,7 @@ void KZGoutput::setFadingDuration(unsigned long aimState, unsigned long duration
 	_aimState=aimState;
 	_isFading=true;
 	_timerPWM=millis();
-	DPRINT_OUT("KZGoutput::setFadingDuration aimState= ");DPRINT_OUT(aimState);
+	DPRINT_OUT("KZGoutput::setFadingDurationLong aimState= ");DPRINT_OUT(aimState);
   DPRINT_OUT(", curState=");DPRINT_OUT(_currentState);
   DPRINT_OUT(", fadeSpeed=");DPRINT_OUT(_fadeSpeed);
   DPRINT_OUT(" duration=");DPRINTLN_OUT(duration);
@@ -99,20 +110,26 @@ void KZGoutput::prepareAutoChangeState(unsigned long futureState, unsigned long 
 	_futureState=futureState;
 	_futureChangeFading=fading;
 }
-void KZGoutput::setOutputThenChange(unsigned long state, unsigned long futureState, unsigned long timeToChangeState)
+void KZGoutput::setOutputThenChange(uint8_t state, uint8_t futureState,  double secondsToChangeState)
 {
-  DPRINTLN_OUT("setOutputThenChange(state: "+String(state)+", futState: "+String(futureState)+", ttc: "+String(timeToChangeState)+")");
-	prepareAutoChangeState(futureState,timeToChangeState,false);
+	//unsigned long state=getUnMappedValue(state);
+	unsigned long futState=getUnMappedValue(futureState);
+	unsigned long timeToChangeState=(unsigned long) secondsToChangeState*1000;
+	
+  	DPRINTLN_OUT("setOutputThenChange(state: "+String(state)+", futState: "+String(futureState)+", ttc: "+String(timeToChangeState)+")");
+	prepareAutoChangeState(futState,timeToChangeState,false);
 	setOutput(state);
 }
-void KZGoutput::setFadingSpeedThenChange(unsigned long aimState, unsigned long speed,unsigned long futureState, unsigned long timeToChangeState)
+/*void KZGoutput::setFadingSpeedThenChange(unsigned long aimState, unsigned long speed,unsigned long futureState, unsigned long timeToChangeState)
 {
 	prepareAutoChangeState(futureState,timeToChangeState,true);
 	setFadingSpeed(aimState,speed);
-}
-void KZGoutput::setFadingDurationThenChange(unsigned long aimState, unsigned long duration, unsigned long futureState, unsigned long timeToChangeState)
+}*/
+void KZGoutput::setFadingDurationThenChange(uint8_t aimState, double duration, uint8_t futureState, double timeToChangeState)
 {
-	prepareAutoChangeState(futureState,timeToChangeState,true);
+	unsigned long fs=getUnMappedValue(futureState);
+	unsigned long ttc=(unsigned long) timeToChangeState*1000;
+  		prepareAutoChangeState(futureState,timeToChangeState,true);
 	setFadingDuration(aimState,duration);
 }
 
@@ -136,7 +153,7 @@ bool KZGoutput::loop()    // if state has changed
         setFadingDuration(_futureState,KZGoutput_autoOFFduration);
       }else
       {
-        setOutput(_futureState);
+        setOutputLong(_futureState);
       }
     }
   }
@@ -221,11 +238,26 @@ bool KZGoutput::loop()    // if state has changed
   }
   return false;
 }
+unsigned long KZGoutput::getUnMappedValue(uint8_t v)
+{
+  return map(v,0,100, _min, _max ); //mapowanie zakresu na skale wyjscia	
+  
+}
+uint8_t KZGoutput::getMappedValue(unsigned long v)
+{
+  return map(v, _min, _max, 0, 100); //mapowanie zakresu na procenty
+}
+uint8_t KZGoutput::getMappedValue(char* txt, unsigned long v)
+{
+  uint8_t val =getMappedValue(v);
+  itoa(val,txt,10);
+  return val;
+}
 char * KZGoutput::getJsonShortStatusChar(char* txt)
 {
   strcpy(txt,String("{\"name\":\"").c_str());  strcat(txt,_name.c_str());
   char u[10];
-  sprintf (u, "%lu", _hardwareState);
+  getMappedValue(u,_hardwareState);//sprintf (u, "%lu", _hardwareState);
   strcat(txt,"\", \"v\":");  strcat(txt,u);
   strcat(txt,"}");
   return txt;
@@ -236,22 +268,28 @@ char * KZGoutput::getJsonStatusChar(char* txt)
   if(isFading())f="1";
   strcpy(txt,String("{\"name\":\"").c_str());  strcat(txt,_name.c_str());
   char u[10];
-  sprintf (u, "%lu", _hardwareState);
+   getMappedValue(u,_hardwareState);//sprintf (u, "%lu", _hardwareState);
   strcat(txt,"\", \"v\":");  strcat(txt,u);
   strcat(txt,", \"isFad\":"); strcat(txt,f.c_str());
-  sprintf (u, "%lu",_aimState);
+  getMappedValue(u,_aimState);//sprintf (u, "%lu",_aimState);
   strcat(txt,", \"aimV\":"); strcat(txt,u);
   f="0";
   unsigned long ttc=0;
+  double d=0;
   if(_isWaitingForChange)
   {
   f="1";
-  ttc=millis()-_waitingForChangeStartTime-_waitingForChangeDuration;
+  ttc=_waitingForChangeStartTime+_waitingForChangeDuration;
+  unsigned long m=millis();
+  if(ttc>m) ttc-=m;else ttc=0;
+   
   }
   strcat(txt,", \"isW8t4Chng\":");strcat(txt,f.c_str());
-  sprintf (u, "%lu",_futureState);
+  getMappedValue(u,_futureState);//sprintf (u, "%lu",_futureState);
   strcat(txt,", \"futSt\":");strcat(txt,u);
-  sprintf (u, "%lu",ttc);
+  d=ttc/1000.0;	
+  dtostrf(d,5, 1, u);  
+  //sprintf (u, "%lu",ttc);
   strcat(txt,", \"ttc\":");strcat(txt,u);
   strcat(txt,"}");
   return txt;
@@ -262,15 +300,21 @@ String KZGoutput::getJsonStatusStr()
 {
   String f="0";
   if(isFading())f="1";
-  String w=/*"{\"pin\":\""+String(_pin)+"\",*/"{\"name\":\""+String(_name)+"\", \"v\":"+String(_hardwareState);
-  w+=", \"isFad\":"+f +", \"aimV\":"+String(_aimState);
+  char u[10];
+  String w=/*"{\"pin\":\""+String(_pin)+"\",*/"{\"name\":\""+String(_name)+"\", \"v\":"+String(getMappedValue(_hardwareState));
+  w+=", \"isFad\":"+f +", \"aimV\":"+String(getMappedValue(_aimState));
   f="0";
   unsigned long ttc=0;
+   double d=0;
   if(_isWaitingForChange)
   {
   f="1";
-  ttc=millis()-_waitingForChangeStartTime-_waitingForChangeDuration;
+  ttc=_waitingForChangeStartTime+_waitingForChangeDuration;
+  unsigned long m=millis();
+  if(ttc>m) ttc-=m;else ttc=0;
   }
-  w+=", \"isW8t4Chng\":"+f+", \"futSt\":"+String(_futureState) + ", \"ttc\":"+String(ttc);
+	char u[10];
+  dtostrf(d,5, 1, u); 
+  w+=", \"isW8t4Chng\":"+f+", \"futSt\":"+String(getMappedValue(_futureState)) + ", \"ttc\":"+String(u);
   return w+="}";
 }
