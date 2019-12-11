@@ -12,6 +12,7 @@ void KZGinput::init(uint8_t pin, String name, uint8_t initState, bool activeLow)
   _pin=pin;
   _name=name;
   pinMode(_pin,INPUT_PULLUP);
+  digitalWrite(_pin, HIGH);   // turn on pulldown resistor
   _state = initState; // starting with state 0: waiting for button to be pressed
 
   if (activeLow) 
@@ -19,7 +20,7 @@ void KZGinput::init(uint8_t pin, String name, uint8_t initState, bool activeLow)
     // button connects ground to the pin when pressed.
     _buttonReleased = HIGH; // notPressed
     _buttonPressed = LOW;
-    digitalWrite(_pin, HIGH);   // turn on pulldown resistor
+    
   } else 
   {
     // button connects VCC to the pin when pressed.
@@ -140,6 +141,7 @@ return txt;
 ///////////////////////////////////////////////////////////////
 //////////////////   loop         /////////////////////////////
 ///////////////////////////////////////////////////////////////
+
 bool KZGinput::loop(void)
 {
   _isClicked=false;
@@ -159,7 +161,7 @@ bool KZGinput::loop(void)
      {
         _state = KZGinput_STAN_KLIK_D; // step to state 
         _startTime = now; // remember starting time
-        DPRINT(F("**** btn pressed r->p: "));DPRINTLN(getStatusString());
+        DPRINT(F("**** btn pressed r->p: "));DPRINTLN(getStatusChar(tmpCharArray));
      } 
     break;
     case KZGinput_STAN_KLIK_D: // czeka na puszczenie przycisku
@@ -167,7 +169,7 @@ bool KZGinput::loop(void)
       {
         _state = KZGinput_STAN_KLIK_DU; // step to state 
         _startTime = now;
-        DPRINT(F("**** btn Clicked? r->p: "));DPRINTLN(getStatusString());
+        DPRINT(F("**** btn Clicked? r->p: "));DPRINTLN(getStatusChar(tmpCharArray));
       } else 
       {
         if ((buttonLevel == _buttonPressed) && (now - _startTime  >  KZGinput_pressTicks)) 
@@ -175,7 +177,7 @@ bool KZGinput::loop(void)
           _isPressed=true;
           _isSwitched=true;
           _state = KZGinput_STAN_PRESSED; // step to state 
-          DPRINT(F("**** btn Switched r->p: "));DPRINTLN(getStatusString());
+          DPRINT(F("**** btn Switched r->p: "));DPRINTLN(getStatusChar(tmpCharArray));
         } else {} // wait. Stay in this state.
       }//else
     break;
@@ -184,14 +186,14 @@ bool KZGinput::loop(void)
       {
         _isClicked=true;
         _state = KZGinput_STAN_RELEASED; // restart.
-        DPRINT(F("**** btn Clicked r->p->r: "));DPRINTLN(getStatusString());
+        DPRINT(F("**** btn Clicked r->p->r: "));DPRINTLN(getStatusChar(tmpCharArray));
       } else 
       {
         if (buttonLevel == _buttonPressed) 
         {
           _state = KZGinput_STAN_KLIK_DUD; // step to state 
           _startTime=now;
-          DPRINT(F("**** btn Clicked w8 4 dbl Click r->p->r->p: "));DPRINTLN(getStatusString());
+          DPRINT(F("**** btn Clicked w8 4 dbl Click r->p->r->p: "));DPRINTLN(getStatusChar(tmpCharArray));
         } // if
       }
     break;
@@ -200,14 +202,14 @@ bool KZGinput::loop(void)
       {
         _isDblClicked=true;
         _state = KZGinput_STAN_PRESSED; // koniec czasu uznaj ze byl klik.
-        DPRINT(F("**** btn dblClicked r->p->r->press: "));DPRINTLN(getStatusString());
+        DPRINT(F("**** btn dblClicked r->p->r->press: "));DPRINTLN(getStatusChar(tmpCharArray));
       } else 
       {
         if (buttonLevel == _buttonReleased) 
         {
           _isDblClicked=true;
           _state = KZGinput_STAN_RELEASED;//KZGinput_STAN_KLIK_DUDU; // koniec
-          DPRINT(F("**** btn dblClicked r->p->r->p->relese: "));DPRINTLN(getStatusString());
+          DPRINT(F("**** btn dblClicked r->p->r->p->relese: "));DPRINTLN(getStatusChar(tmpCharArray));
         } // if
       }
     break;
@@ -216,7 +218,7 @@ bool KZGinput::loop(void)
       {
         _state = KZGinput_STAN_KLIK_U; // step to state 
         _startTime = now; // remember starting time
-        DPRINT(F("**** btn relesed p->r: "));DPRINTLN(getStatusString());
+        DPRINT(F("**** btn relesed p->r: "));DPRINTLN(getStatusChar(tmpCharArray));
      }
     break;
     case KZGinput_STAN_KLIK_U:
@@ -224,7 +226,7 @@ bool KZGinput::loop(void)
       {
         _state = KZGinput_STAN_KLIK_UD; // step to state 
         _startTime = now;
-        DPRINT(F("**** btn Clicked? p->r: "));DPRINTLN(getStatusString());
+        DPRINT(F("**** btn Clicked? p->r: "));DPRINTLN(getStatusChar(tmpCharArray));
       }
       else 
       {
@@ -233,7 +235,7 @@ bool KZGinput::loop(void)
           _isSwitched=true;
           _isRelesed=true;
           _state = KZGinput_STAN_RELEASED; 
-          DPRINT(F("**** btn Switched p->r: "));DPRINTLN(getStatusString());
+          DPRINT(F("**** btn Switched p->r: "));DPRINTLN(getStatusChar(tmpCharArray));
         } else {} // wait. Stay in this state.
       }
     break;
@@ -242,7 +244,7 @@ bool KZGinput::loop(void)
       { 
         _isClicked=true;
         _state = KZGinput_STAN_PRESSED; // restart.
-        DPRINT(F("**** btn Clicked p->r->p: "));DPRINTLN(getStatusString());
+        DPRINT(F("**** btn Clicked p->r->p: "));DPRINTLN(getStatusChar(tmpCharArray));
         
       } else
       {
@@ -250,7 +252,7 @@ bool KZGinput::loop(void)
         {
           _state = KZGinput_STAN_KLIK_UDU; // step to state 
           _startTime=now;
-          DPRINT(F("**** btn Clicked w8 4 dbl Click p->r->p->r: "));DPRINTLN(getStatusString());
+          DPRINT(F("**** btn Clicked w8 4 dbl Click p->r->p->r: "));DPRINTLN(getStatusChar(tmpCharArray));
         } // if
       }
     break;
@@ -259,14 +261,14 @@ bool KZGinput::loop(void)
       {
         _isDblClicked=true;
         _state = KZGinput_STAN_RELEASED;
-        DPRINT(F("**** btn dblClicked p->r->p->release: "));DPRINTLN(getStatusString());
+        DPRINT(F("**** btn dblClicked p->r->p->release: "));DPRINTLN(getStatusChar(tmpCharArray));
       } else
       {
         if (buttonLevel == _buttonPressed) 
         {
           _isDblClicked=true;
           _state = KZGinput_STAN_PRESSED; // koniec
-          DPRINT(F("**** btn dblClicked p->r->p->r->press: "));DPRINTLN(getStatusString());
+          DPRINT(F("**** btn dblClicked p->r->p->r->press: "));DPRINTLN(getStatusChar(tmpCharArray));
         } // if
       }
     break;
