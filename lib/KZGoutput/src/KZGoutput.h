@@ -53,8 +53,9 @@ class KZGoutput
   public:
     KZGoutput(){};
     void begin(String name, uint8_t pin, unsigned long on, unsigned long off, unsigned long initState, bool usePCA9685);
- //   unsigned long getOnValue(){return _on;}
- //   unsigned long getOffValue(){return _off;}
+    unsigned long getOnValue(){return getMappedValue(_on);}
+    unsigned long getOffValue(){return getMappedValue(_off);}
+    unsigned long getValue(){return getMappedValue(_currentState);}
   //  void setOutputON(){setOutputLong(_on);}
    // void setOutputOFF(){setOutputLong(_off);}
     
