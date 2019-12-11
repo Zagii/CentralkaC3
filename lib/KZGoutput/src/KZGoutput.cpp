@@ -102,7 +102,7 @@ void KZGoutput::setFadingDurationLong(unsigned long aimState, unsigned long dura
 	DPRINT_OUT(" startMillis=");DPRINTLN_OUT(_timerPWM);
 
 }
-void KZGoutput::prepareAutoChangeState(unsigned long futureState, unsigned long timeToChangeState,bool fading)
+void KZGoutput::prepareAutoChangeStateLong(unsigned long futureState, unsigned long timeToChangeState,bool fading)
 {
 	_isWaitingForChange=true; 
 	_waitingForChangeDuration=timeToChangeState;
@@ -117,7 +117,7 @@ void KZGoutput::setOutputThenChange(uint8_t state, uint8_t futureState,  double 
 	unsigned long timeToChangeState=(unsigned long) secondsToChangeState*1000;
 	
   	DPRINTLN_OUT("setOutputThenChange(state: "+String(state)+", futState: "+String(futureState)+", ttc: "+String(timeToChangeState)+")");
-	prepareAutoChangeState(futState,timeToChangeState,false);
+	prepareAutoChangeStateLong(futState,timeToChangeState,false);
 	setOutput(state);
 }
 /*void KZGoutput::setFadingSpeedThenChange(unsigned long aimState, unsigned long speed,unsigned long futureState, unsigned long timeToChangeState)
@@ -125,11 +125,11 @@ void KZGoutput::setOutputThenChange(uint8_t state, uint8_t futureState,  double 
 	prepareAutoChangeState(futureState,timeToChangeState,true);
 	setFadingSpeed(aimState,speed);
 }*/
-void KZGoutput::setFadingDurationThenChange(uint8_t aimState, double duration, uint8_t futureState, double timeToChangeState)
+void KZGoutput::setFadingDurationThenChange(uint8_t aimState, double duration, uint8_t futureState, double secondsToChangeState)
 {
-	unsigned long fs=getUnMappedValue(futureState);
-	unsigned long ttc=(unsigned long) timeToChangeState*1000;
-  		prepareAutoChangeState(futureState,timeToChangeState,true);
+	unsigned long futState=getUnMappedValue(futureState);
+	unsigned long timeToChangeState=(unsigned long) secondsToChangeState*1000;
+  		prepareAutoChangeStateLong(futState,timeToChangeState,true);
 	setFadingDuration(aimState,duration);
 }
 
@@ -150,7 +150,7 @@ bool KZGoutput::loop()    // if state has changed
       _isFading=false;
       if(_futureChangeFading)
       {
-        setFadingDuration(_futureState,KZGoutput_autoOFFduration);
+        setFadingDurationLong(_futureState,KZGoutput_autoOFFduration);
       }else
       {
         setOutputLong(_futureState);
