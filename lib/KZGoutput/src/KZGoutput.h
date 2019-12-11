@@ -47,30 +47,37 @@ class KZGoutput
 	bool _futureChangeFading=false;
 	
 	void prepareAutoChangeState(unsigned long futureState, unsigned long timeToChangeState,bool fading);
+	void setOutputLong(unsigned long state);
+	void setFadingSpeedLong(unsigned long aimState, unsigned long speed);
+        void setFadingDurationLong(unsigned long aimState, unsigned long duration);
   public:
     KZGoutput(){};
     void begin(String name, uint8_t pin, unsigned long on, unsigned long off, unsigned long initState, bool usePCA9685);
-    void setOutput(unsigned long state);
-    void setOutputStopWaiting(unsigned long state);
-    unsigned long getOnValue(){return _on;}
-    unsigned long getOffValue(){return _off;}
-    void setOutputON(){setOutput(_on);}
-    void setOutputOFF(){setOutput(_off);}
-    void setFadingSpeed(unsigned long aimState, unsigned long speed);
-    void setFadingDuration(unsigned long aimState, unsigned long duration);
+ //   unsigned long getOnValue(){return _on;}
+ //   unsigned long getOffValue(){return _off;}
+  //  void setOutputON(){setOutputLong(_on);}
+   // void setOutputOFF(){setOutputLong(_off);}
+    
     bool loop();    // if state has changed
-    unsigned long getState(){return _hardwareState;}
+    //unsigned long getState(){return _hardwareState;}
     String getJsonStatusStr();
     char * getJsonStatusChar(char* txt);
     char * getJsonShortStatusChar(char* txt);
     bool isFading(){return _isFading;}
-
+	unsigned long getUnMappedValue(uint8_t v);
+    uint8_t getMappedValue(unsigned long v);    
+    uint8_t getMappedValue(char* txt, unsigned long v);
     void stopWaitingStopFading();
     unsigned long getTimeOfHardwareState(){return _timeOfHardwareState;}
     String getName(){return _name;}
-	void setOutputThenChange(unsigned long state, unsigned long futureState, unsigned long timeToChangeState);
-	void setFadingSpeedThenChange(unsigned long aimState, unsigned long speed,unsigned long futureState, unsigned long timeToChangeState);
-	void setFadingDurationThenChange(unsigned long aimState, unsigned long duration, unsigned long futureState, unsigned long timeToChangeState);
+	
+	void setOutput(uint8_t state);
+	//void setOutputStopWaiting(uint8_t state);
+	//void setFadingSpeed(unsigned long aimState, unsigned long speed);
+    	void setFadingDuration(unsigned long aimState, unsigned long duration);
+	void setOutputThenChange(uint8_t state,uint8_t futureState, double timeToChangeState);
+	//void setFadingSpeedThenChange(unsigned long aimState, unsigned long speed,unsigned long futureState, unsigned long timeToChangeState);
+	void setFadingDurationThenChange(uint8_t aimState, double duration, uint8_t futureState, double timeToChangeState);
 
 };
 #endif
