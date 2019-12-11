@@ -94,12 +94,13 @@ void KZGcentralka::mqttMyCallbackChar(char* topic, char* msg)
     }
         
    //     DPRINTLN_CENT(id);
-    uint16_t value; 
+    uint8_t value; 
     char* rozkaz=doc["set"]|"brak";
     if(strcmp(rozkaz,"brak")==0) return;
     if(strcmp(rozkaz,"ON")==0) value=_outputs[id].getOnValue();
     else if(strcmp(rozkaz,"OFF")==0) value=_outputs[id].getOffValue();
     else if(strcmp(rozkaz,"PWM")==0) value=doc["pwm"];
+    else if(strcmp(rozkaz,"W8")==0) value=_outputs[id].getValue();
     unsigned long def=999999;
     uint8_t def8=111; //tylko zakres 0-100%
     double defD=-1.0; //ujemne nie mogą być
@@ -122,7 +123,7 @@ void KZGcentralka::mqttMyCallbackChar(char* topic, char* msg)
           _outputs[id].setFadingDurationThenChange(value,duration,futureState,ttc);
         else 
           _outputs[id].setOutputThenChange(value,futureState,ttc);
-      }else
+      }else // ON, OFF, W8
       {
         _outputs[id].setOutputThenChange(value,futureState,ttc);
       }
@@ -135,7 +136,7 @@ void KZGcentralka::mqttMyCallbackChar(char* topic, char* msg)
           _outputs[id].setFadingDuration(value,duration);
         else 
           _outputs[id].setOutput(value);
-      }else
+      }else // ON, OFF, W8
       {
 	_outputs[id].stopWaitingStopFading();
         _outputs[id].setOutput(value);
