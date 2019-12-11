@@ -104,7 +104,15 @@ void KZGcentralka::mqttMyCallbackChar(char* topic, char* msg)
     uint8_t def8=111; //tylko zakres 0-100%
     double defD=-1.0; //ujemne nie mogą być
     double ttc=doc["ttc"]|defD; // za ile bedzie zmiana stanu
-    uint8_t futureState=doc["futSt"]|def8; //na jaki stan zmieniamy
+    uint8_t futureState	 =def8;
+       if(doc["futSt"].is<char*>())
+	{
+	   if(strcmp(doc["futSt"],"ON")==0)
+	     futureState=_outputs[id].getOnValue();
+    	   else 
+	     futureState=_outputs[id].getOffValue();
+	}
+	 else futureState=doc["futSt"]|def8; //na jaki stan zmieniamy
     double duration =doc["dur"]|defD;
     if((ttc!=defD)&&(futureState!=def8)) //timeToChange, czyli będzie zmiana stanu po czasie duratiuon
     {                 // zmieni sie na futureState
