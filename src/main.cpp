@@ -60,7 +60,7 @@ enum wejPIN_TXT                    {  w1  ,    w2 ,   w3  ,  w4,     w5  ,  w6, 
 //enum wejPIN_ENUM                 {  INP1, INP2  ,INP3 ,   INP4 , INP5 , INP6 ,   INP7 , INP8 ,  INP9 ,   INP10 ,INP11,  INP12, INP13 , INP14 , INP15 , INP16 };//"INP11","INP12"
 const uint8_t wejPIN_pin[]  =       {  A0,     A1,    A2,    A3,     A4,    A5,      A6,    A7,  A8,   A9,  A10,  A11,  A12,  A13,  A14};   //  0,      1
 static const  char* wejItem[]  =   {  "w1",   "w2",  "w3",  "w4",   "w5",  "w6" ,   "w7",  "w8","w9", "p1", "p2", "p3", "p4", "p5","p6"};
-static const bool activeLowItem[]= { false,false,  false, false, false,  false,  false,  false, false,false,true,false,false,false,false};
+static const bool activeLowItem[]= { false,false,  false, false, false,  false,  false,  false, false,false,true,false,true,false,false};
                                       /// brakuje 2=1wire,4,5, 10, 12
 const byte ile_wejsc=15;
 
@@ -69,7 +69,7 @@ const uint8_t oneWirePin=2;
 const uint8_t ds18b20precision=9;
 const unsigned long tempFreq=60000;
 ///////////////////////////////////
-String myName="c3";
+const char* myName="c3";
 
 KZGcentralka c;
 
@@ -78,8 +78,10 @@ void setup()
 {
     Serial.begin(115200);
     
-    Serial.println("############## Setup() ############");
+    Serial.println(F("############## Setup() ############"));
+    Serial.print(F("FreeMem: "));Serial.println(freeMemory());
     delay(3000);
+    
     byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
     IPAddress mqttHost(192, 168, 1, 132);
 
@@ -92,13 +94,15 @@ void setup()
    // c.addOutput("o1",11,255,0,0);
    // c.addOutput("o2",12,255,0,0);
      
-    String n;
+    //String n;
+    char n[10];
     for(uint8_t j=0 ;j<ile_wejsc;j++)
     {
-       n= myName+String(wejItem[j]);
+      // n= myName+String(wejItem[j]);
+        strcpy(n,myName);strcat(n,wejItem[j]);
    //    if(wejItem[j][0]=='p') /// czy pir
      //   {
-            c.addInput(wejPIN_pin[j],n.c_str(),KZGinput_STAN_RELEASED,activeLowItem[j]);
+            c.addInput(wejPIN_pin[j],n,KZGinput_STAN_RELEASED,activeLowItem[j]);
        // }else
         //{
           //  c.addInput(wejPIN_pin[j],n.c_str(),KZGinput_STAN_RELEASED,false);
@@ -107,23 +111,31 @@ void setup()
 
     for(uint8_t i=0;i<ile_wyjsc;i++)
     {
-      n= myName+String(wyjItem[i]);
+      //n= myName+String(wyjItem[i]);
+      strcpy(n,myName);strcat(n,wyjItem[i]);
      // Serial.println(String("out i: "+String(i)+", pin: "+String(wyjPIN_pin[i])));
       if(wyjPWM[i])
       {
-        c.addOutput(n.c_str(),wyjPIN_pin[i],0xFFF,0,0,true);
+        c.addOutput(n,wyjPIN_pin[i],0xFFF,0,0,true);
       }else
       {
-          c.addOutput(n.c_str(),wyjPIN_pin[i],0,1,1,false);
+          c.addOutput(n,wyjPIN_pin[i],0,1,1,false);
       }
     }
 
     Serial.println("Koniec Setup"); 
 }
 
-
+int x=0,popX=0;
+unsigned long ms=0;
 void loop()
 {
-    c.loop();
-    
+  c.loop();
+  popX=x;
+  x=digitalRead(A12);
+  if(popX==0)if(x==1)ms=millis();
+  if(popX==1)if(x==0)
+  {
+      Serial.println("Koniec jedynki millis: "+String(millis()/1000.0)+"s. dl="+String(millis()-ms));
+  }
 }

@@ -45,7 +45,7 @@ class KZGinput
 {
     uint8_t _pin;        // hardware pin number. 
     String _name;        // human button name
-    char tmpCharArray[100];
+    static char tmpCharArray[130];
     uint8_t _buttonReleased;//==HIGH
     uint8_t _buttonPressed;//==LOW
     uint8_t _buttonState = HIGH;             // the current reading from the input pin

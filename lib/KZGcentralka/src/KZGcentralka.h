@@ -21,8 +21,8 @@
   #define DPRINTLN(...)   //now defines a blank line
 #endif
 
-#define MAX_INPUTS 20
-#define MAX_OUPUTS 25
+#define MAX_INPUTS 16
+#define MAX_OUPUTS 23
 //#define MAX_TERMOMETERS 6
 
 

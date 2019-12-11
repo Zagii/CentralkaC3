@@ -2,7 +2,7 @@
 #define KZGoutput_h
 
 #include <Arduino.h>
-#define DEBUG_KZG_OUTPUT   //If you comment this line, the DPRINT & DPRINTLN lines are defined as blank.
+//#define DEBUG_KZG_OUTPUT   //If you comment this line, the DPRINT & DPRINTLN lines are defined as blank.
 #ifdef DEBUG_KZG_OUTPUT    //Macros are usually in all capital letters.
   #define DPRINT_OUT(...)    Serial.print(__VA_ARGS__)     //DPRINT is a macro, debug print
   #define DPRINTLN_OUT(...)  Serial.println(__VA_ARGS__)   //DPRINTLN is a macro, debug print with new line
@@ -75,7 +75,7 @@ class KZGoutput
 	void setOutput(uint8_t state);
 	//void setOutputStopWaiting(uint8_t state);
 	//void setFadingSpeed(unsigned long aimState, unsigned long speed);
-    	void setFadingDuration(unsigned long aimState, unsigned long duration);
+    	void setFadingDuration(uint8_t aimState, double duration);
 	void setOutputThenChange(uint8_t state, uint8_t futureState,  double secondsToChangeState);
 	//void setFadingSpeedThenChange(unsigned long aimState, unsigned long speed,unsigned long futureState, unsigned long timeToChangeState);
 	void setFadingDurationThenChange(uint8_t aimState, double duration, uint8_t futureState, double secondsToChangeState);

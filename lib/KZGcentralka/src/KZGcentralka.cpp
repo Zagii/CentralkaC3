@@ -6,6 +6,7 @@ char globalMsg[200];
 
 void mqttCallback(char* topic, uint8_t* payload, unsigned int length) 
 {
+  
 	if(length>=200)
 	{
 		strcpy(globalMsg,"mqttCallbackLenErr: ");
@@ -14,7 +15,8 @@ void mqttCallback(char* topic, uint8_t* payload, unsigned int length)
 		    globalMsg[i+1]=(char)payload[i];
 		}
 		 globalMsg[198]='\0';
-		_ethMqtt.publishDebugChar(globalMsg);
+	//	_ethMqtt.publishDebugChar(globalMsg);
+  DPRINTLN_CENT(globalMsg);
 	}
   if(globalIsMqttW8ing)return; /// anty spam
 
@@ -242,12 +244,13 @@ void KZGcentralka::begin(String name,byte mac[], IPAddress mqttHostIP, String mq
 {
   DPRINTLN_CENT("Debug KZGcentralka::begin start"); 
   _name=name;
+  DPRINT("begin mqtt");DPRINTLN_CENT(freeMemory());
   _ethMqtt.begin(name,mac,mqttHostIP,mqttHost,mqttUser,mqttPwd,mqttPort,mqttCallback);
   
  // _ethMqtt.begin(name,mac,mqttHost,mqttUser,mqttPwd,mqttPort,[this] (String topic, String msg) { this->callback(String topic, String msg); }));
   _input_num=0;
   _output_num=0;
-
+     DPRINT("begin oneWire");DPRINTLN_CENT(freeMemory());
   _oneW=new KZGoneWireDev();
   _oneW->begin(w1_pin,ds18b20precision,tempFreq);
 
@@ -309,7 +312,7 @@ void KZGcentralka::loop()
       //  String s="{\"name\":\""+_name+"\", \"tempAddr\": \""+_oneW->getDeviceAddresStr(i)+"\"";
         //s+=", \"t\": "+String(_oneW->getDeviceTemperature(i))+"}";
 	      
-	 strcpy(_jsonCharArr,"{\"name\":\""); strcat(_jsonCharArr,_nameCh);
+	 strcpy(_jsonCharArr,"{\"name\":\""); strcat(_jsonCharArr,_name.c_str());
 	 strcat(_jsonCharArr,"\", \"tempAddr\": \"");strcat(_jsonCharArr,_oneW->getDeviceAddresStr(i).c_str());
 	 String tstr=String(_oneW->getDeviceTemperature(i));
 	 strcat(_jsonCharArr,"\", \"t\": "); strcat(_jsonCharArr,tstr.c_str()); strcat(_jsonCharArr,"}");
@@ -350,14 +353,14 @@ void KZGcentralka::loop()
        DPRINT_CENT("@@@ output change finished: ");
        DPRINT_CENT(strlen(_jsonCharArr));
        DPRINTLN_CENT(_jsonCharArr);
-       _ethMqtt.publishPrefixChar("output/"+String(i)+"/",_jsonCharArr);
+       _ethMqtt.publishPrefixChar("output/"+String(j)+"/",_jsonCharArr);
     }
     if(_outputs[j].isFading())
     {
         if(millis()%300==0)
         {
 	    _outputs[j].getJsonShortStatusChar(_jsonCharArr);
-	    _ethMqtt.publishPrefixChar("output/"+String(i)+"/",_jsonCharArr);
+	    _ethMqtt.publishPrefixChar("output/"+String(j)+"/",_jsonCharArr);
            // String so= _outputs[j].getJsonStatusStr();
             //DPRINT_CENTLN("@@@@@@@@ analog output is fading: ");
             //DPRINTLN_CENT(so);

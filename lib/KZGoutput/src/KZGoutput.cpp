@@ -76,7 +76,7 @@ void KZGoutput::setFadingSpeedLong(unsigned long aimState, unsigned long speed)
  * *************************/
 void KZGoutput::setFadingDuration(uint8_t aimState, double duration)
 {
-	unsigned long as=getUnMappedValue(aimstate);
+	unsigned long as=getUnMappedValue(aimState);
 	unsigned long dur=(unsigned long) duration*1000;
 	setFadingDurationLong(as,dur);
 }
@@ -313,7 +313,7 @@ String KZGoutput::getJsonStatusStr()
   unsigned long m=millis();
   if(ttc>m) ttc-=m;else ttc=0;
   }
-	char u[10];
+	
   dtostrf(d,5, 1, u); 
   w+=", \"isW8t4Chng\":"+f+", \"futSt\":"+String(getMappedValue(_futureState)) + ", \"ttc\":"+String(u);
   return w+="}";

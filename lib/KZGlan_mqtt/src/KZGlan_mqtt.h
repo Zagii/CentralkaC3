@@ -5,7 +5,7 @@
 #include <Ethernet.h>
 #include <PubSubClient.h>   
 
-//#define DEBUG_LAN_MQTT   //If you comment this line, the DPRINT & DPRINTLN lines are defined as blank.
+#define DEBUG_LAN_MQTT   //If you comment this line, the DPRINT & DPRINTLN lines are defined as blank.
 #undef DEBUG_LAN_MQTT
 #ifdef DEBUG_LAN_MQTT    //Macros are usually in all capital letters.
   #define DPRINT_LAN(...)    Serial.print(__VA_ARGS__)     //DPRINT is a macro, debug print
@@ -66,7 +66,7 @@ public:
   KZGlan_mqttCallback _mqttCallback;
   KZGlan_mqtt(){};
   void begin(String name,byte * mac, IPAddress mqttHostIP, String mqttHost,String mqttUser,String mqttPwd, uint16_t mqttPort, KZGlan_mqttCallback mqttCallback);
-  void beginCh(chr* name,byte * mac, IPAddress mqttHostIP, char* mqttHost,char* mqttUser,char* mqttPwd, uint16_t mqttPort, KZGlan_mqttCallback mqttCallback);
+ // void beginCh(char* name,byte * mac, IPAddress mqttHostIP, char* mqttHost,char* mqttUser,char* mqttPwd, uint16_t mqttPort, KZGlan_mqttCallback mqttCallback);
   void loop();
   String getEthStatusString();
   void publish(String topic, String msg);
