@@ -53,6 +53,88 @@ DPRINT_CENT("### mqtt<>KZGcentralka::MyCallback -> topic: ");
   DPRINTLN_CENT(msgStr);
 
 }*/
+void KZGcentralka::mqttMyCallbackChar(char* topic, char* msg)
+{
+	DPRINT_CENT("### KZGcentralka::mqttMyCallbackChar -> topic: ");
+  	DPRINT_CENT(topic);
+  	DPRINT_CENT(", msg: ");
+  	DPRINTLN_CENT(msg);
+ if (strstr(topic, "set") != NULL) 
+ {
+    	 //DPRINTLN_CENT("topic zawiera set");
+    StaticJsonDocument<200> doc;
+    //DynamicJsonDocument doc(msg.length());
+    DeserializationError error = deserializeJson(doc, msg);
+    if (error)
+    {
+      DPRINT_CENT("Deserialize Error!->");DPRINTLN_CENT(error.c_str());
+    return;
+    }
+    const char* name = doc["out"];
+    const char* c=doc["c"]; 
+    char fullName[10];
+    strcpy(fullName,c);
+    strcat(fullName,name);
+  //  DPRINT_CENT("   szukamy, name:");DPRINTLN_CENT(nameStr);
+    uint8_t id=255;
+    //////// szukanie odpowiedniego wyjscia
+    for(uint8_t i=0;i<_output_num;i++)
+    {
+      if(strcmp(_outputs[i].getName().c_str(),fullName)==0)
+      {
+        id=i;
+        break;
+      }
+    }
+    if(id==255)
+    {
+      DPRINT_CENT("!! unknown name: ");
+      DPRINTLN_CENT(fullName);
+      return;
+    }
+        
+   //     DPRINTLN_CENT(id);
+    uint16_t value; 
+    char* rozkaz=doc["set"]|"brak";
+    if(strcmp(rozkaz,"brak")==0) return;
+    if(strcmp(rozkaz,"ON")==0) value=_outputs[id].getOnValue();
+    else if(strcmp(rozkaz,"OFF")==0) value=_outputs[id].getOffValue();
+    else if(strcmp(rozkaz,"PWM")==0) value=doc["pwm"];
+    unsigned long def=999999;
+    uint8_t def8=111; //tylko zakres 0-100%
+    double defD=-1.0; //ujemne nie mogą być
+    double ttc=doc["ttc"]|defD; // za ile bedzie zmiana stanu
+    uint8_t futureState=doc["futSt"]|def8; //na jaki stan zmieniamy
+    double duration =doc["dur"]|defD;
+    if((ttc!=defD)&&(futureState!=def8)) //timeToChange, czyli będzie zmiana stanu po czasie duratiuon
+    {                 // zmieni sie na futureState
+     if(strcmp(rozkaz,"PWM")==0)
+      {
+        if(duration!=defD)
+          _outputs[id].setFadingDurationThenChange(value,duration,futureState,ttc);
+        else 
+          _outputs[id].setOutputThenChange(value,futureState,ttc);
+      }else
+      {
+        _outputs[id].setOutputThenChange(value,futureState,ttc);
+      }
+    } else
+    {
+     if(strcmp(rozkaz,"PWM")==0)
+      {
+        _outputs[id].stopWaitingStopFading();
+        if(duration!=defD)
+          _outputs[id].setFadingDuration(value,duration);
+        else 
+          _outputs[id].setOutput(value);
+      }else
+      {
+	_outputs[id].stopWaitingStopFading();
+        _outputs[id].setOutput(value);
+      }
+    }  
+}
+}
 void KZGcentralka::mqttMyCallbackStr(String topic, String msg)
 {
   DPRINT_CENT("### KZGcentralka::mqttMyCallbackStr -> topic: ");
@@ -197,9 +279,10 @@ void KZGcentralka::loop()
 {
   if(globalIsMqttW8ing)
   {
-    String st=String(globalTopic);
-    String sm=String(globalMsg);
-    mqttMyCallbackStr(st,sm);
+  //  String st=String(globalTopic);
+  //  String sm=String(globalMsg);
+  //  mqttMyCallbackStr(st,sm);
+    mqttMyCallbackChar(globalTopic,globalMsg);
     globalIsMqttW8ing=false;
   }
   _ethMqtt.loop();
