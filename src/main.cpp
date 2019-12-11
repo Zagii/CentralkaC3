@@ -60,6 +60,7 @@ enum wejPIN_TXT                    {  w1  ,    w2 ,   w3  ,  w4,     w5  ,  w6, 
 //enum wejPIN_ENUM                 {  INP1, INP2  ,INP3 ,   INP4 , INP5 , INP6 ,   INP7 , INP8 ,  INP9 ,   INP10 ,INP11,  INP12, INP13 , INP14 , INP15 , INP16 };//"INP11","INP12"
 const uint8_t wejPIN_pin[]  =       {  A0,     A1,    A2,    A3,     A4,    A5,      A6,    A7,  A8,   A9,  A10,  A11,  A12,  A13,  A14};   //  0,      1
 static const  char* wejItem[]  =   {  "w1",   "w2",  "w3",  "w4",   "w5",  "w6" ,   "w7",  "w8","w9", "p1", "p2", "p3", "p4", "p5","p6"};
+static const bool activeLowItem[]= { false,false,  false, false, false,  false,  false,  false, false,false,true,false,false,false,false};
                                       /// brakuje 2=1wire,4,5, 10, 12
 const byte ile_wejsc=15;
 
@@ -95,13 +96,13 @@ void setup()
     for(uint8_t j=0 ;j<ile_wejsc;j++)
     {
        n= myName+String(wejItem[j]);
-       if(wejItem[j][0]=='p') /// czy pir
-        {
-            c.addInput(wejPIN_pin[j],n.c_str(),KZGinput_STAN_RELEASED,true);
-        }else
-        {
-            c.addInput(wejPIN_pin[j],n.c_str(),KZGinput_STAN_RELEASED,false);
-        }
+   //    if(wejItem[j][0]=='p') /// czy pir
+     //   {
+            c.addInput(wejPIN_pin[j],n.c_str(),KZGinput_STAN_RELEASED,activeLowItem[j]);
+       // }else
+        //{
+          //  c.addInput(wejPIN_pin[j],n.c_str(),KZGinput_STAN_RELEASED,false);
+        //}
     }
 
     for(uint8_t i=0;i<ile_wyjsc;i++)
