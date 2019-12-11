@@ -2,10 +2,20 @@
 
 bool globalIsMqttW8ing=false;
 char globalTopic[70];
-char globalMsg[150];
+char globalMsg[200];
 
 void mqttCallback(char* topic, uint8_t* payload, unsigned int length) 
 {
+	if(length>=200)
+	{
+		strcpy(globalMsg,"mqttCallbackLenErr: ");
+	 	for(unsigned int i=strlen(globalMsg);i<197;i++)
+		{
+		    globalMsg[i+1]=(char)payload[i];
+		}
+		 globalMsg[198]='\0';
+		_ethMqtt.publishDebugChar(globalMsg);
+	}
   if(globalIsMqttW8ing)return; /// anty spam
 
 	DPRINT_CENT("### mqtt<>Callback -> topic: ");
