@@ -56,6 +56,7 @@ class KZGcentralka
   void addInput(uint8_t pin,String nazwa, uint8_t initState, bool activeLow);
   void addOutput(String name, uint8_t pin, uint16_t on, uint16_t off, uint16_t initState,bool usePCA9685);
   void mqttMyCallbackStr(String topic, String msg);
+  void mqttMyCallbackChar(char* topic, char* msg);
   //void checkNewTermometers();
 };
 #endif
