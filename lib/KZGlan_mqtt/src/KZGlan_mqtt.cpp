@@ -31,40 +31,34 @@
     //_mqttCallback(topicStr,msgStr);
   }
 }*/
-void KZGlan_mqtt::publish(String topic, String msg)
+void KZGlan_mqtt::publish(char* topic, char* msg)
 {
   if (_mqttClient.connected())
   {
-    _mqttClient.publish(topic.c_str(),msg.c_str());
+    _mqttClient.publish(topic,msg);
   }
 }
-void KZGlan_mqtt::publishPrefixChCh(char* t,char* m)
+void KZGlan_mqtt::publishPrefixCh(char* t,char* m)
 {
-  if (_mqttClient.connected())
-  {
-    char topic[MAX_TOPIC];
-    strcpy(topic,_mojTopicIDPublishCh);
-    strcat(topic,t);
-    _mqttClient.publish(topic,m);
-  }
+    strcpy(tmpCharArr,_mojTopicIDPublishCh);
+    strcat(tmpCharArr,t);
+    publish(tmpCharArr,m);
+  
 }
-void KZGlan_mqtt::publishPrefixChar(String topic,char* m)
+void KZGlan_mqtt::publishDebugChar(char* m)
+{  
+    publish(_mojTopicIDPublishDebugCh,m); 
+}
+/*void KZGlan_mqtt::publishPrefixChar(String topic,char* m)
 {
   if (_mqttClient.connected())
   {
     String t=_mojTopicIDPublish+topic;
     _mqttClient.publish(t.c_str(),m);
   }
-}
-void KZGlan_mqtt::publishDebugChar(char* m)
-{
-  if (_mqttClient.connected())
-  {
-    
-    _mqttClient.publish(_mojTopicIDPublishDebugCh,m);
-  }
-}
-void KZGlan_mqtt::publishPrefix(String topic, String msg)
+}*/
+
+/*void KZGlan_mqtt::publishPrefix(String topic, String msg)
 {
   if (_mqttClient.connected())
   {
@@ -80,40 +74,43 @@ void KZGlan_mqtt::publishPrefix(String topic, String msg)
     DPRINTLN_LAN("ERRR: KZGlan_mqtt::publishPrefix - mqttClient not connected");
   }
   
-}
-
+}*/
 
 void KZGlan_mqtt::begin(String name,byte * mac, IPAddress mqttHostIP, String mqttHost,String mqttUser,String mqttPwd, uint16_t mqttPort, KZGlan_mqttCallback mqttCallback)
 {
+   begin(name.c_str(),mac,mqttHostIP,mqttHost.c_str(),mqttUser.c_str(),mqttPwd.c_str(),mqttPort,mqttCallback);
+}
+void KZGlan_mqtt::begin(char* name,byte * mac, IPAddress mqttHostIP, char* mqttHost,char* mqttUser,char* mqttPwd, uint16_t mqttPort, KZGlan_mqttCallback mqttCallback)
+{
   DPRINTLN_LAN("Debug KZGlan_mqtt::begin start"); 
-  _name=name;	strcpy(_nameCh,name.c_str());
+  	strcpy(_nameCh,name);
   _mac[0]=mac[0];_mac[1]=mac[1];_mac[2]=mac[2];
   _mac[3]=mac[3];_mac[4]=mac[4];_mac[5]=mac[5];
-  _mojTopicIDSubscribe=name+"/Sub/#"; //topic z komunikatami z serwera
+//  _mojTopicIDSubscribe=name+"/Sub/#"; //topic z komunikatami z serwera
 	strcpy(_mojTopicIDSubscribeCh,_nameCh); strcat(_mojTopicIDSubscribeCh,"/Sub/#");
-  _mojTopicIDSubscribeConfig=name+"/ConfigSub/#"; //topic z komunikatami z serwera
+  //_mojTopicIDSubscribeConfig=name+"/ConfigSub/#"; //topic z komunikatami z serwera
 	strcpy(_mojTopicIDSubscribeConfigCh,_nameCh); strcat(_mojTopicIDSubscribeConfigCh,"/ConfigSub/#");
-  _mojTopicIDPublish=name+"/Pub/"; // topic z komunikatami do serwera
+  //_mojTopicIDPublish=name+"/Pub/"; // topic z komunikatami do serwera
 	strcpy(_mojTopicIDPublishCh,_nameCh); strcat(_mojTopicIDPublishCh,"/Pub/");
-  _mojTopicIDPublishDebug="DebugTopic/"+name+"/"; // topic z komunikatami do serwera
+  //_mojTopicIDPublishDebug="DebugTopic/"+name+"/"; // topic z komunikatami do serwera
 	strcpy(_mojTopicIDPublishDebugCh,"DebugTopic/"); strcat(_mojTopicIDPublishDebugCh,_nameCh);
-  _mojTopicIDPing=name+"/Ping/"; //topic z komukatami keepalive
+  //_mojTopicIDPing=name+"/Ping/"; //topic z komukatami keepalive
 	strcpy(_mojTopicIDPingCh,_nameCh); strcat(_mojTopicIDPingCh,"/Ping/");
-  _mqttUsr=mqttUser;
+  //_mqttUsr=mqttUser;
 	strcpy(_mqttUsrCh,mqttUser.c_str());
-  _mqttPwd=mqttPwd;
+  //_mqttPwd=mqttPwd;
 	strcpy(_mqttPwdCh,mqttPwd.c_str());
   _mqttPort=mqttPort;
-  if(mqttHost=="")
+  if(strlen(mqttHost)==0)
   {
-    _mqttHostDNS="";
+    //_mqttHostDNS="";
     _mqttHostIP[0]=mqttHostIP[0];_mqttHostIP[1]=mqttHostIP[1];
     _mqttHostIP[2]=mqttHostIP[2];_mqttHostIP[3]=mqttHostIP[3];
     _mqttClient.setServer(_mqttHostIP, _mqttPort);
   }else
   {
-    _mqttHostDNS=mqttHost;
-    _mqttClient.setServer(_mqttHostDNS.c_str(), _mqttPort);
+   // _mqttHostDNS=mqttHost;
+    //_mqttClient.setServer(_mqttHostDNS.c_str(), _mqttPort);
   }
   //_mqttClient.setCallback(MQTTcallback); <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   _mqttCallback = mqttCallback;
@@ -137,8 +134,8 @@ void KZGlan_mqtt::ethReconnect()
   if(!Ethernet.begin(_mac))
   {
      DPRINTLN_LAN(F("failed"));
-      auto link = Ethernet.linkStatus();
-  DPRINT_LAN("Link status: ");
+     auto link = Ethernet.linkStatus();
+     DPRINT_LAN("Link status: ");
   switch (link) {
     case Unknown:
       DPRINTLN_LAN("Unknown");
@@ -155,7 +152,7 @@ void KZGlan_mqtt::ethReconnect()
       DPRINTLN_LAN(Ethernet.localIP());
       DPRINTLN_LAN(Ethernet.gatewayIP());
   }
-  DPRINTLN_LAN(getEthStatusString());
+  DPRINTLN_LAN(getEthStatusChar());
 }
 void KZGlan_mqtt::mqttReconnect()
 {
@@ -165,24 +162,24 @@ void KZGlan_mqtt::mqttReconnect()
     _mqttClient.disconnect();
     DPRINT_LAN(F("Proba polaczenia z MQTT .."));
     bool mqttconnStat=false;
-    if(_mqttUsr.length()>0)
+    if(strlen(_mqttUsrCh)>0)
     {
-      mqttconnStat=_mqttClient.connect(_name.c_str(),_mqttUsr.c_str(),_mqttPwd.c_str());
+      mqttconnStat=_mqttClient.connect(_nameCh,_mqttUsrCh,_mqttPwdCh);
     }else
     {
-      mqttconnStat=_mqttClient.connect(_name.c_str());
+      mqttconnStat=_mqttClient.connect(_nameCh);
     }
     if(mqttconnStat) 
     {
-		DPRINTLN_LAN(F(" [ok]"));
-		DPRINTLN_LAN(F("Subskrypcja mqtt: "));
-        _mqttClient.subscribe(_mojTopicIDSubscribe.c_str());
-		DPRINT_LAN(F("-- "));DPRINT_LAN(_mojTopicIDSubscribe);DPRINTLN_LAN(F("; "));
-        _mqttClient.subscribe(_mojTopicIDSubscribeConfig.c_str());
-        DPRINT_LAN(F("-- "));DPRINT_LAN(_mojTopicIDSubscribeConfig);DPRINTLN_LAN(F("; "));
-		_mqttClient.subscribe(_mojTopicIDPing.c_str());
+	DPRINTLN_LAN(F(" [ok]"));
+	DPRINTLN_LAN(F("Subskrypcja mqtt: "));
+        _mqttClient.subscribe(_mojTopicIDSubscribeCh);
+	DPRINT_LAN(F("-- "));DPRINT_LAN(_mojTopicIDSubscribeCh);DPRINTLN_LAN(F("; "));
+        _mqttClient.subscribe(_mojTopicIDSubscribeConfigCh);
+        DPRINT_LAN(F("-- "));DPRINT_LAN(_mojTopicIDSubscribeConfigCh);DPRINTLN_LAN(F("; "));
+	_mqttClient.subscribe(_mojTopicIDPingCh);
         DPRINT_LAN(F("-- "));DPRINT_LAN(_mojTopicIDPing);DPRINTLN_LAN(F("; "));
-		_mqttClient.publish(_mojTopicIDPublishDebug.c_str(),"Polaczenie");
+	_mqttClient.publish(_mojTopicIDPublishDebugCh,"Polaczenie");
         
       }else
       {
@@ -192,9 +189,29 @@ void KZGlan_mqtt::mqttReconnect()
     }
 }
 
+char* KZGlan_mqtt::getEthStatusChar() 
+{
+  strcpy(tmpCharArr,""); 
+  char a[4];
+  if(_ethClient.connected())
+  {
+    IPAddress ip=Ethernet.localIP();
+    strcat(tmpCharArr,"Eth connected: ");
+	
+	itoa(ip[0],a,10);strcat(tmpCharArr,a);strcat(tmpCharArr,".");
+	itoa(ip[1],a,10);strcat(tmpCharArr,a);strcat(tmpCharArr,".");
+	itoa(ip[2],a,10);strcat(tmpCharArr,a);strcat(tmpCharArr,".");
+	itoa(ip[3],a,10);strcat(tmpCharArr,a);strcat(tmpCharArr,".");  
+  }else
+  {
+  strcat(tmpCharArr,"Eth Connection Error. status= ");
+  itoa(_ethClient.connected(),a,10); strcat(tmpCharArr,a);
+    
+  }
+  return tmpCharArr;
+}
 
-
-String KZGlan_mqtt::getEthStatusString() 
+/*String KZGlan_mqtt::getEthStatusString_wywalic() 
 {
   String statStr=""; 
   if(_ethClient.connected())
@@ -208,7 +225,7 @@ String KZGlan_mqtt::getEthStatusString()
     
   }
   return statStr;
-}
+}*/
 
 void KZGlan_mqtt::loop()
 {
@@ -220,7 +237,7 @@ void KZGlan_mqtt::loop()
     if( _isEthNewDisconnecion)
     {
       DPRINTLN_LAN(F("*** -> Eth disconnected ***"));
-      DPRINTLN_LAN(getEthStatusString());
+      DPRINTLN_LAN(getEthStatusChar());
       _isEthNewDisconnecion=false;
     }
     if (now - _lastEthReconnectAttempt > 5000) 
@@ -229,13 +246,14 @@ void KZGlan_mqtt::loop()
       DPRINTLN_LAN(F("*** Eth reconnecting.."));
       _isEthNewConnecion=true;
       ethReconnect();
+      mqttReconnect();
     }
   } else
   {
     if(_isEthNewConnecion)
     {
       DPRINTLN_LAN(F("*** -> Eth new conn estabilished ***"));
-      DPRINTLN_LAN(getEthStatusString());
+      DPRINTLN_LAN(getEthStatusChar());
       _isEthNewConnecion=false;
       _isEthNewDisconnecion=true;
     }
@@ -268,9 +286,9 @@ void KZGlan_mqtt::loop()
         hr=hr%24;
         
         char tmp[50];
-        sprintf ( tmp,"%s: %02lud%02lu:%02lu:%02lu ",_name.c_str(),dd,hr, min,sec);
+        sprintf ( tmp,"%s: %02lud%02lu:%02lu:%02lu ",_nameCh,dd,hr, min,sec);
         
-        _mqttClient.publish(_mojTopicIDPing.c_str(),tmp);
+        _mqttClient.publish(_mojTopicIDPingCh,tmp);
       }  
     }
   }
