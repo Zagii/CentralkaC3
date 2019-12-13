@@ -24,6 +24,7 @@ typedef void (*KZGlan_mqttCallback) (char* topic, uint8_t* payload, unsigned int
 class KZGlan_mqtt
 {
   byte _mac[6];//    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
+  char tmpCharArr[50];
   EthernetClient _ethClient;
   PubSubClient _mqttClient;    
   unsigned long _ostatniOdczytanyPingMqtt=0;    // mqtt callback ustawia odczyt pingu
@@ -33,18 +34,18 @@ class KZGlan_mqtt
   bool _isEthNewConnecion=false;                // flag - new connection estabilished
   bool _isEthNewDisconnecion=false;             // flag - Eth dc occured
   
-  String _mqttHostDNS = "m20.cloudmqtt.com";  // dns - mqtt host
+  //String _mqttHostDNS = "m20.cloudmqtt.com";  // dns - mqtt host
   IPAddress _mqttHostIP;                      // ip - mqtt  host
   uint16_t _mqttPort=11379;
-  String _mqttUsr="";
-  String _mqttPwd="";
+  //String _mqttUsr="";
+ // String _mqttPwd="";
   
-  String _name="Cdef";                         // human name of device
-  String _mojTopicIDSubscribe="/Sub/";         //topic z komunikatami z serwera
-  String _mojTopicIDSubscribeConfig="/Config/";   //topic z komunikatami z serwera
-  String _mojTopicIDPublish="C1/Pub/";         // topic z komunikatami do serwera
-  String _mojTopicIDPublishDebug="DebugTopic/C1/"; // topic z komunikatami do serwera
-  String _mojTopicIDPing="C1/Ping/";           //topic z komukatami keepalive
+//  String _name="Cdef";                         // human name of device
+//  String _mojTopicIDSubscribe="/Sub/";         //topic z komunikatami z serwera
+  //String _mojTopicIDSubscribeConfig="/Config/";   //topic z komunikatami z serwera
+  //String _mojTopicIDPublish="C1/Pub/";         // topic z komunikatami do serwera
+  //String _mojTopicIDPublishDebug="DebugTopic/C1/"; // topic z komunikatami do serwera
+  //String _mojTopicIDPing="C1/Ping/";           //topic z komukatami keepalive
   
   char _mqttUsrCh[10];
   char _mqttPwdCh[10];
@@ -65,15 +66,16 @@ class KZGlan_mqtt
 public:
   KZGlan_mqttCallback _mqttCallback;
   KZGlan_mqtt(){};
+  void begin(char* name,byte * mac, IPAddress mqttHostIP, char* mqttHost,char* mqttUser,char* mqttPwd, uint16_t mqttPort, KZGlan_mqttCallback mqttCallback);
   void begin(String name,byte * mac, IPAddress mqttHostIP, String mqttHost,String mqttUser,String mqttPwd, uint16_t mqttPort, KZGlan_mqttCallback mqttCallback);
  // void beginCh(char* name,byte * mac, IPAddress mqttHostIP, char* mqttHost,char* mqttUser,char* mqttPwd, uint16_t mqttPort, KZGlan_mqttCallback mqttCallback);
   void loop();
-  String getEthStatusString();
-  void publish(String topic, String msg);
+  char* getEthStatusChar();
+  void publish(char* topic, char* msg);
   void publishDebugChar(char* m);
-  void publishPrefix(String topic, String msg);
-  void publishPrefixChCh(char* topic,char* m);
-  void publishPrefixChar(String topic,char* m);
+  //void publishPrefix(String topic, String msg);
+  void publishPrefixCh(char* topic,char* m);
+ // void publishPrefixChar(String topic,char* m);
   PubSubClient getMqttClient(){return _mqttClient;}
 };
 #endif
